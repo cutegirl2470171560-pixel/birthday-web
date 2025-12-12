@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday | The 2025 Experience</title>
+    
+    <!-- Fonts: Outfit (Modern Sans) and Playfair Display (Elegant Serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;800&family=Playfair+Display:ital,wght@1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for High-End Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --bg-color: #050505;
+            --text-main: #ffffff;
+            --accent-1: #d4b2ff; /* Soft Lilac */
+            --accent-2: #ff9fb4; /* Modern Pink */
+            --accent-glow: rgba(212, 178, 255, 0.4);
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+            --font-main: 'Outfit', sans-serif;
+            --font-serif: 'Playfair Display', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            cursor: none; /* Custom cursor */
+        }
+
+        /* Noise Texture Overlay for 2025 Feel */
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999;
+            opacity: 0.05;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='1'/%3E%3C/svg%3E");
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 20px;
+            height: 20px;
+            border: 1px solid white;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 1000;
+            mix-blend-mode: difference;
+            transition: transform 0.2s ease;
+        }
+        .cursor.hovered {
+            transform: scale(2.5);
+            background: white;
+            border: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-1);
+            border-radius: 4px;
+        }
+
+        /* --- SECTIONS --- */
+
+        /* 1. Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        .loader-text {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            font-style: italic;
+            overflow: hidden;
+        }
+        .loader-text span {
+            display: inline-block;
+            transform: translateY(100%);
+        }
+
+        /* 2. Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+        }
+
+        /* Ambient Glow Background */
+        .gradient-orb {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: breathe 8s infinite alternate;
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1) translate(-20%, -20%); opacity: 0.6; }
+            100% { transform: scale(1.2) translate(10%, 10%); opacity: 0.8; }
+        }
+
+        h1.big-title {
+            font-size: clamp(3rem, 10vw, 9rem);
+            font-weight: 800;
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -0.04em;
+            background: linear-gradient(to right, #fff, #b4b4b4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            font-family: var(--font-serif);
+            font-size: clamp(1.2rem, 3vw, 2.5rem);
+            font-style: italic;
+            color: var(--accent-1);
+            margin-top: 1rem;
+            opacity: 0; /* Animated in */
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            opacity: 0.7;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        /* 3. Bento Grid / Memories */
+        .memories {
+            padding: 10vh 5vw;
+            min-height: 100vh;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+        }
+        
+        .section-header h2 {
+            font-size: 3rem;
+            font-weight: 300;
+        }
+
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .bento-card {
+            background: var(--glass);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 2rem;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .bento-card:hover {
+            border-color: var(--accent-1);
+        }
+
+        .card-large {
+            grid-column: span 1;
+        }
+        
+        @media (min-width: 900px) {
+            .card-large {
+                grid-column: span 2;
+            }
+        }
+
+        .bento-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.6;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            z-index: -1;
+        }
+
+        .bento-card:hover .bento-img {
+            opacity: 0.8;
+            transform: scale(1.05);
+        }
+
+        .card-text {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            font-size: 1rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* 4. Heartfelt Message */
+        .message-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem;
+            text-align: left;
+            position: relative;
+        }
+
+        .message-container {
+            max-width: 800px;
+        }
+
+        .message-line {
+            font-size: clamp(1.5rem, 4vw, 3rem);
+            line-height: 1.4;
+            margin-bottom: 2rem;
+            opacity: 0.2; /* Default state for scroll reveal */
+            transition: opacity 0.5s ease;
+            font-family: var(--font-serif);
+        }
+
+        .message-line.active {
+            opacity: 1;
+            color: var(--accent-2);
+        }
+
+        /* 5. Interactive Cake / Wish */
+        .finale {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1a0b2e 0%, #000 70%);
+        }
+
+        .candle-container {
+            position: relative;
+            cursor: pointer;
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: var(--glass);
+            border: 1px solid var(--border);
+            transition: all 0.5s ease;
+        }
+
+        .candle-container:hover {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .flame {
+            width: 20px;
+            height: 60px;
+            background: linear-gradient(#ff9fb4, #d4b2ff);
+            border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 20px #ff9fb4, 0 0 60px #d4b2ff;
+            animation: flicker 0.1s infinite alternate;
+            transform-origin: bottom center;
+        }
+
+        @keyframes flicker {
+            0% { transform: skewX(-2deg) scaleY(1); opacity: 0.9; }
+            100% { transform: skewX(2deg) scaleY(1.1); opacity: 1; }
+        }
+
+        .wish-text {
+            margin-top: 2rem;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        
+        .blown-out {
+            background: #333 !important;
+            box-shadow: none !important;
+            animation: none !important;
+            opacity: 0.3;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Visual Noise -->
+    <div class="noise-overlay"></div>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+
+    <!-- 1. LOADER -->
+    <div class="loader">
+        <div class="loader-text">
+            <span class="l-1">Calculating</span>
+            <span class="l-2">Years</span>
+            <span class="l-3">of</span>
+            <span class="l-4">Awesomeness...</span>
+        </div>
+    </div>
+
+    <!-- 2. HERO -->
+    <section class="hero">
+        <div class="gradient-orb"></div>
+        <h1 class="big-title">
+            <div class="h-line">Happy</div>
+            <div class="h-line">Birthday</div>
+        </h1>
+        <div class="subtitle">To my favorite human.</div>
+        <div class="scroll-indicator">Scroll to Explore</div>
+    </section>
+
+    <!-- 3. MEMORIES (BENTO GRID) -->
+    <!-- CUSTOMIZE HERE: Replace images and text -->
+    <section class="memories">
+        <div class="section-header">
+            <h2>The Highlights Reel</h2>
+        </div>
+        
+        <div class="bento-grid">
+            <!-- Box 1: Text -->
+            <div class="bento-card">
+                <div class="card-text">
+                    <h3 class="card-title">Day One</h3>
+                    <p class="card-desc">Remember when we first met? I knew instantly we'd be trouble together. Here is to the chaos we create.</p>
+                </div>
+            </div>
+
+            <!-- Box 2: Image Wide -->
+            <!-- Use absolute URLs or placeholders -->
+            <div class="bento-card card-large">
+                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Memory" class="bento-img">
+                <div class="card-text" style="margin-top: auto;">
+                    <h3 class="card-title">Iconic Duo</h3>
+                </div>
+            </div>
+
+            <!-- Box 3: Quote -->
+            <div class="bento-card" style="background: var(--accent-1); color: #000;">
+                <div class="card-text">
+                    <h3 class="card-title" style="font-family: var(--font-serif); font-size: 2rem;">"She is a queen, her soul is royalty."</h3>
+                </div>
+            </div>
+
+            <!-- Box 4: Image -->
+            <div class="bento-card">
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Memory" class="bento-img">
+            </div>
+
+            <!-- Box 5: Future -->
+            <div class="bento-card card-large">
+                <div class="card-text">
+                    <h3 class="card-title">2025 Vision</h3>
+                    <p class="card-desc">This is your year. The year of abundance, self-love, and achieving everything you've ever wanted.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. EMOTIONAL MESSAGE -->
+    <section class="message-section">
+        <div class="message-container">
+            <!-- GSAP will highlight these lines as you scroll -->
+            <p class="message-line">Another year around the sun.</p>
+            <p class="message-line">Watching you grow has been the greatest privilege.</p>
+            <p class="message-line">You are kind, fierce, and unapologetically you.</p>
+            <p class="message-line">Thank you for being my therapist, my stylist, and my rock.</p>
+            <p class="message-line">I love you more than words can say.</p>
+        </div>
+    </section>
+
+    <!-- 5. FINALE -->
+    <section class="finale">
+        <div class="candle-container" id="makeAWish">
+            <div class="flame" id="flame"></div>
+        </div>
+        <h2 class="wish-text" id="wishText">Make a Wish & Click the Flame</h2>
+    </section>
+
+    <script>
+        // --- CUSTOM CURSOR LOGIC ---
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Hover effect for links and buttons
+        const interactables = document.querySelectorAll('a, button, .bento-card, .candle-container');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+        });
+
+        // --- ANIMATION TIMELINE (GSAP) ---
+        gsap.registerPlugin(ScrollTrigger);
+
+        const tl = gsap.timeline();
+
+        // 1. Loader Animation
+        tl.to('.l-1', { y: 0, duration: 0.5, ease: 'power2.out' })
+          .to('.l-2', { y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+          .to('.l-3', { y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+          .to('.l-4', { y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.3')
+          .to('.loader', { y: '-100%', duration: 1, ease: 'power4.inOut', delay: 0.5 });
+
+        // 2. Hero Animation
+        tl.from('.h-line', {
+            y: 100,
+            opacity: 0,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'power3.out'
+        }, '-=0.5');
+        
+        tl.to('.subtitle', { opacity: 1, duration: 1 }, '-=0.5');
+
+        // 3. Bento Grid Animation (ScrollTrigger)
+        gsap.utils.toArray('.bento-card').forEach((card, i) => {
+            gsap.from(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 85%',
+                },
+                y: 50,
+                opacity: 0,
+                duration: 0.8,
+                ease: 'power2.out'
+            });
+        });
+
+        // 4. Message Reading Experience
+        gsap.utils.toArray('.message-line').forEach((line) => {
+            gsap.to(line, {
+                scrollTrigger: {
+                    trigger: line,
+                    start: 'top 60%',
+                    end: 'top 40%',
+                    scrub: true,
+                    toggleClass: 'active'
+                }
+            });
+        });
+
+        // 5. Finale Animation
+        gsap.to('.wish-text', {
+            scrollTrigger: {
+                trigger: '.finale',
+                start: 'top 60%'
+            },
+            opacity: 1,
+            y: 0,
+            duration: 1
+        });
+
+        // --- INTERACTION: MAKE A WISH ---
+        const candleBtn = document.getElementById('makeAWish');
+        const flame = document.getElementById('flame');
+        const wishText = document.getElementById('wishText');
+
+        candleBtn.addEventListener('click', () => {
+            // Blow out candle
+            flame.classList.add('blown-out');
+            
+            // Change text
+            wishText.innerHTML = "May all your dreams come true! <br> Happy Birthday Bestie!";
+            
+            // Trigger Confetti
+            launchConfetti();
+        });
+
+        function launchConfetti() {
+            var duration = 3000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 },
+                    colors: ['#d4b2ff', '#ff9fb4', '#ffffff']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 },
+                    colors: ['#d4b2ff', '#ff9fb4', '#ffffff']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
+    </script>
+</body>
+</html>
